@@ -12,9 +12,9 @@ export interface SortState {
 }
 
 const initialState: SortState = {
-  size: 100,
+  size: 50,
   min: 5,
-  max: 1000,
+  max: 300,
   array: [],
   timer: 0,
   comparaison: 0,
@@ -34,7 +34,7 @@ const sortSlice = createSlice({
     },
     setArray(state) {
       state.array = []
-      generateArray(state.array, state.size, state.min, state.max)
+      // generateArray(state.array, state.size, state.min, state.max)
     },
     startTimer(state) {
       state.timer = Date.now() / 1000

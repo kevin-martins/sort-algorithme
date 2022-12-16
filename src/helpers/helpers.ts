@@ -2,10 +2,35 @@ export const randomNumbers = (min: number, max: number): number => {
     return Math.floor(Math.random() * (max  - min - 1) + min)
 }
 
-export const generateArray = (array: number[], size: number, min: number = 5, max: number = 1000): void => {
-    for (let i = 0; i < size; i++) {
+export const generateArray = (size: number, min: number = 5, max: number = 1000): number[] => {
+    const array = []
+    for (let i = 0; i < size; i++)
         array.push(randomNumbers(min, max))
+    return array
+}
+
+export const bubbleSort = (array: number[]): number[] => {
+    while (!isSorted(array)) {
+        for (let i = 1; i < array.length; i++) {
+            if (array[i - 1] > array[i])
+                swap(array, i-1, i)
+        }
     }
+    return [...array]
+}
+
+export const isSorted = (array: number[]): boolean => {
+    for (let i = 1; i < array.length; i++)
+        if (array[i - 1] > array[i])
+            return false
+    return true
+}
+
+export const swap = (array: number[], i: number, j: number): number[] => {
+    const temp = array[i]
+    array[i] = array[j]
+    array[j] = temp
+    return array
 }
 
 export const roundNumber = (number: number, decimal: number = 3): number => {
