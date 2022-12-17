@@ -9,7 +9,7 @@ export const generateArray = (size: number, min: number = 5, max: number = 1000)
     return array
 }
 
-export const bubbleSort = (array: number[]): number[] => {
+export const bubbleSort = async (array: number[]): Promise<number[]> => {
     while (!isSorted(array)) {
         for (let i = 1; i < array.length; i++) {
             if (array[i - 1] > array[i])

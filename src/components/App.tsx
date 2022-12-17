@@ -18,17 +18,28 @@ export const App = () => {
   const max = useAppSelector(state => state.sort.max)
   const [array, setArray] = useState(generateArray(size, min, max))
   // const timer = useAppSelector(state => state.sort.timer)
-  const [timer, setTimer] = useState<number>(0)
+  const [time, setTime] = useState<{ sec: number, mili: number }>({ sec: 0, mili: 0 })
+  const [sort, setSort] = useState<SortType>(SortType.Bubble)
+  const [startTimer, setStatTimer] = useState(false)
   const dispatch = useAppDispatch()
 
   const handleSort = (e: any) => {
-    console.log(e.target.value, SortType.Bubble)
-    // const sort: number = e.target.value
-    if (e.target.value as number === SortType.Bubble) {
-      console.log('here')
-      setArray(bubbleSort(array))
-    }
+    setTime((current) => { return { ...current, sec: 0, mili: 0 }})
+    setSort(e.target.value as SortType)
   }
+
+  useEffect(() => {
+    if (startTimer) {
+      const timer = setInterval(() => {
+        if (time.mili > 98)
+          setTime((current) => { return { ...current, sec: current.sec++, mili: 0 }})
+        else
+          setTime((current) => { return { ...current, mili: current.mili++ }})
+      }, 10)
+      return () => clearInterval(timer)
+    }
+    return
+  }, [startTimer])
 
   return (
     <div className="relative bg-gray-800 h-screen">
@@ -36,7 +47,8 @@ export const App = () => {
         <button
           type="button"
           onClick={() => {
-            setTimer(0.00)
+            setTime((current) => { return { ...current, sec: 0, mili: 0 }})
+            setStatTimer(false)
             setArray(generateArray(size, min, max))
           }}
           className='text-white text-xl border-[1px] border-white px-8 py-4 hover:bg-white hover:text-black'
@@ -46,27 +58,22 @@ export const App = () => {
         <button
           type="button"
           onClick={() => {
-            // dispatch(startTimer)
-            setTimer(Date.now() / 1000)
-            setArray(bubbleSort(array))
-            setTimer((current) => Date.now() / 1000 - current)
-            // dispatch(stopTimer)
+            setStatTimer((current) => {return !current})
           }}
           className='text-white text-xl border-[1px] border-white px-8 py-4 hover:bg-white hover:text-black'
         >
-          Bubble Sort
+          Timer
         </button>
         <select
-          // value=''
-          defaultValue="bubble"
+          // defaultValue="bubble"
           name='sot-algorithme'
           className='text-white bg-gray-800 text-xl border-[1px] border-white px-8 py-4 hover:bg-white hover:text-black'
           onChange={handleSort}
         >
+          <option value={SortType.Bubble}>Bubble Sort</option>
           <option value={SortType.Merge}>Merge Sort</option>
           <option value={SortType.Quick}>Quick Sort</option>
           <option value={SortType.Heap}>Heap Sort</option>
-          <option value={SortType.Bubble}>Bubble Sort</option>
         </select>
         <select
           // value=''
@@ -80,7 +87,21 @@ export const App = () => {
           <option value='growing'>Growing</option>
           <option value='sound'>Sound</option>
         </select>
-        <p className="text-white ml-auto mr-5 my-auto">{timer}</p>
+        <button
+          type="button"
+          onClick={async () => {
+            console.log(sort, SortType.Bubble.toString())
+            const date = Date.now() / 1000
+            if (sort === SortType.Bubble) {
+              setArray(await bubbleSort(array))
+              console.log((Date.now() / 1000) - date)
+            }
+          }}
+          className='text-white text-xl border-[1px] border-white px-8 py-4 hover:bg-white hover:text-black'
+        >
+          Launch
+        </button>
+        <p className="text-white ml-auto mr-5 my-auto text-xl">{time.sec}:{time.mili < 10 && '0'}{time.mili}</p>
       </div>
       <div className="text-white ml-5">
         <p>screen width: {window.screen.width}</p>
