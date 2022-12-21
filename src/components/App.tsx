@@ -28,17 +28,19 @@ export const App = () => {
   }
 
   const handleStartStopTimer = (): void => {
-    if (startTimer) return setStatTimer(false)
-    return setStatTimer(true)
+    // if (startTimer) return setStatTimer(false)
+    return setStatTimer((current) => !current)
   }
 
-  const handleSortLaunch = async () => {
-    console.log(sort, SortType.Bubble.toString())
-    const date = Date.now() / 1000
+  const handleSort = async () => {
+    // console.log(sort, SortType.Bubble.toString())
+    // const date = Date.now() / 1000
+    setStatTimer(true)
     if (sort === SortType.Bubble) {
-      setArray(await bubbleSort(array))
-      console.log((Date.now() / 1000) - date)
+      await setArray(await bubbleSort(array))
+      // console.log((Date.now() / 1000) - date)
     }
+    setStatTimer(false)
   }
 
   useEffect(() => {
@@ -48,7 +50,7 @@ export const App = () => {
           setTime((current) => { return { ...current, sec: current.sec++, mili: 0 }})
         else
           setTime((current) => { return { ...current, mili: current.mili++ }})
-      }, 10)
+      }, 1)
       return () => clearInterval(timer)
     }
     return;
@@ -70,12 +72,12 @@ export const App = () => {
 
   return (
     <div className="relative bg-gray-800 h-screen">
-      <div className="flex shadow-xl h-14 w-full">
+      <div className="flex shadow-xl h-14 w-full  mx-auto">
         <Button onClick={handleNewArray} text="new Array" />
         <Button onClick={handleStartStopTimer} text="Start/Stop Timer" />
         <Select name="sort-algorithme" onChange={handleSortSelection} options={sortOptions} />
         <Select name="display-mode" onChange={() => {}} options={displayOptions} />
-        <Button onClick={handleSortLaunch} text="Sort" />
+        <Button onClick={handleSort} text="Sort" />
         <p className="text-white ml-auto mr-5 my-auto text-xl">{time.sec}:{time.mili < 10 && 0}{time.mili}</p>
       </div>
       <div className="text-white ml-5">

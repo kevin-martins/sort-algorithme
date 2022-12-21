@@ -12,7 +12,7 @@ export interface SortState {
 }
 
 const initialState: SortState = {
-  size: 1500,
+  size: 50,
   min: 5,
   max: 300,
   array: [],
