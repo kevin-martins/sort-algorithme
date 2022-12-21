@@ -1,31 +1,44 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { fitScreen, setArray, startTimer, stopTimer } from "../features/sort-slice";
-import { bubbleSort, generateArray, isSorted, roundNumber, swap } from "../helpers/helpers";
-
-const enum SortType {
-  Bubble,
-  Quick,
-  Heap,
-  Merge,
-}
+import { bubbleSort, generateArray } from "../helpers/helpers";
+import { SortDisplay, SortType } from "../models/sort";
+import Button from "./Button";
+import Select from "./Select";
 
 export const App = () => {
-  // const array = useAppSelector(state => state.sort.array)
-  // const array = [200, 320, 50, 80, 120, 180, 250, 90, 380]
   const size = useAppSelector(state => state.sort.size)
   const min = useAppSelector(state => state.sort.min)
   const max = useAppSelector(state => state.sort.max)
   const [array, setArray] = useState(generateArray(size, min, max))
-  // const timer = useAppSelector(state => state.sort.timer)
-  const [time, setTime] = useState<{ sec: number, mili: number }>({ sec: 0, mili: 0 })
   const [sort, setSort] = useState<SortType>(SortType.Bubble)
+  const [time, setTime] = useState<{ sec: number, mili: number }>({ sec: 0, mili: 0 })
   const [startTimer, setStatTimer] = useState(false)
+  // const 
   const dispatch = useAppDispatch()
 
-  const handleSort = (e: any) => {
+  const handleSortSelection = (e: any) => {
     setTime((current) => { return { ...current, sec: 0, mili: 0 }})
     setSort(e.target.value as SortType)
+  }
+
+  const handleNewArray = (): void => {
+    setTime((current) => { return { ...current, sec: 0, mili: 0 }})
+    setStatTimer(false)
+    setArray(generateArray(size, min, max))
+  }
+
+  const handleStartStopTimer = (): void => {
+    if (startTimer) return setStatTimer(false)
+    return setStatTimer(true)
+  }
+
+  const handleSortLaunch = async () => {
+    console.log(sort, SortType.Bubble.toString())
+    const date = Date.now() / 1000
+    if (sort === SortType.Bubble) {
+      setArray(await bubbleSort(array))
+      console.log((Date.now() / 1000) - date)
+    }
   }
 
   useEffect(() => {
@@ -38,70 +51,32 @@ export const App = () => {
       }, 10)
       return () => clearInterval(timer)
     }
-    return
-  }, [startTimer])
+    return;
+  })
+
+  const sortOptions = [
+    { value: SortType.Bubble, text: "Bubble Sort" },
+    { value: SortType.Merge, text: "Merge Sort" },
+    { value: SortType.Quick, text: "Quick Sort" },
+    { value: SortType.Heap, text: "Heap Sort" },
+  ]
+
+  const displayOptions = [
+    { value: SortDisplay.Castle, text: "Castle" },
+    { value: SortDisplay.Falling, text: "Falling" },
+    { value: SortDisplay.Growing, text: "Growing" },
+    { value: SortDisplay.Sound, text: "Sound" },
+  ]
 
   return (
     <div className="relative bg-gray-800 h-screen">
-      <div className="flex ">
-        <button
-          type="button"
-          onClick={() => {
-            setTime((current) => { return { ...current, sec: 0, mili: 0 }})
-            setStatTimer(false)
-            setArray(generateArray(size, min, max))
-          }}
-          className='text-white text-xl border-[1px] border-white px-8 py-4 hover:bg-white hover:text-black'
-        >
-          new Array
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setStatTimer((current) => {return !current})
-          }}
-          className='text-white text-xl border-[1px] border-white px-8 py-4 hover:bg-white hover:text-black'
-        >
-          Timer
-        </button>
-        <select
-          // defaultValue="bubble"
-          name='sot-algorithme'
-          className='text-white bg-gray-800 text-xl border-[1px] border-white px-8 py-4 hover:bg-white hover:text-black'
-          onChange={handleSort}
-        >
-          <option value={SortType.Bubble}>Bubble Sort</option>
-          <option value={SortType.Merge}>Merge Sort</option>
-          <option value={SortType.Quick}>Quick Sort</option>
-          <option value={SortType.Heap}>Heap Sort</option>
-        </select>
-        <select
-          // value=''
-          defaultValue="bubble"
-          name='sot-algorithme'
-          className='text-white bg-gray-800 text-xl border-[1px] border-white px-8 py-4 hover:bg-white hover:text-black'
-          onChange={(e) => console.log(e.target.value)}
-        >
-          <option value='castle'>Castle</option>
-          <option value='falling'>Falling</option>
-          <option value='growing'>Growing</option>
-          <option value='sound'>Sound</option>
-        </select>
-        <button
-          type="button"
-          onClick={async () => {
-            console.log(sort, SortType.Bubble.toString())
-            const date = Date.now() / 1000
-            if (sort === SortType.Bubble) {
-              setArray(await bubbleSort(array))
-              console.log((Date.now() / 1000) - date)
-            }
-          }}
-          className='text-white text-xl border-[1px] border-white px-8 py-4 hover:bg-white hover:text-black'
-        >
-          Launch
-        </button>
-        <p className="text-white ml-auto mr-5 my-auto text-xl">{time.sec}:{time.mili < 10 && '0'}{time.mili}</p>
+      <div className="flex shadow-xl h-14 w-full">
+        <Button onClick={handleNewArray} text="new Array" />
+        <Button onClick={handleStartStopTimer} text="Start/Stop Timer" />
+        <Select name="sort-algorithme" onChange={handleSortSelection} options={sortOptions} />
+        <Select name="display-mode" onChange={() => {}} options={displayOptions} />
+        <Button onClick={handleSortLaunch} text="Sort" />
+        <p className="text-white ml-auto mr-5 my-auto text-xl">{time.sec}:{time.mili < 10 && 0}{time.mili}</p>
       </div>
       <div className="text-white ml-5">
         <p>screen width: {window.screen.width}</p>
